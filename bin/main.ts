@@ -1,17 +1,20 @@
-import { App } from 'aws-cdk-lib';
+import * as cdk from 'aws-cdk-lib';
 import * as blueprints from '@aws-quickstart/eks-blueprints';
-import { MyFluentBitAddOn } from '../dist';
+import { KomdorAddOn } from '../lib';
 
-const app = new App();
+const app = new cdk.App();
 
-blueprints.EksBlueprint.builder()
-    .addOns(new blueprints.MetricsServerAddOn)
-    .addOns(new blueprints.ClusterAutoScalerAddOn)
-    .addOns(new blueprints.addons.SSMAgentAddOn) // needed for AWS internal accounts only
-    .addOns(new blueprints.SecretsStoreAddOn) // requires to support CSI Secrets
-     .addOns(new MyFluentBitAddOn({
-         cloudWatchRegion: 'us-east-2',
-         //licenseKeySecret: 'my-addon-license', // if you set it, make sure there is a secret named my-addon-license-key in the target region
-         namespace: 'my-addon-namespace'
-     }))
-     .build(app, 'my-extension-test-blueprint');
+const addOns: Array<blueprints.ClusterAddOn> = [
+    new KomdorAddOn({
+        // One of these must be uncommented and configured
+        // apiKey: '<api key>',
+        // apiKeyExistingSecret: '<secret name>'
+    })
+];
+
+const account = '<account id>'
+const region = '<region>'
+const stackID = '<stack id>'
+const props = { env: { account, region } }
+
+new blueprints.EksBlueprint(app, { id: stackID, addOns}, props)
