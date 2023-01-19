@@ -11,7 +11,9 @@ HOMEBREW_LIBS :=  nvm typescript argocd
 deps: bootstrap
 	npm install
 
-
+deps-ci:
+	npm install
+	
 lint: 
 	$(ESLINT) . --ext .js,.jsx,.ts,.tsx
 
