@@ -17,11 +17,6 @@ jobs:
         uses: actions/setup-node@v3.1.1
         with:
           node-version: ${{ matrix.node }}
-
-      - name: Deps
-        run: make deps
-        shell: bash
-
       - name: Build
         run: make build
         shell: bash
