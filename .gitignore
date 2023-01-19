@@ -2,6 +2,7 @@
 *.d.ts
 node_modules
 .vscode
+.DS_STORE
 
 .classpath.txt
 .idea
@@ -17,4 +18,5 @@ dist
 cdk.context.json
 package-lock.json
 yarn.lock
+
 

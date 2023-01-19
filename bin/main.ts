@@ -4,17 +4,16 @@ import { KomdorAddOn } from '../lib';
 
 const app = new cdk.App();
 
+const account = '<account id>'
+const region = '<region>'
+const clusterName = '<cluster name>'
+const props = { env: { account, region } }
+
 const addOns: Array<blueprints.ClusterAddOn> = [
     new KomdorAddOn({
-        // One of these must be uncommented and configured
-        // apiKey: '<api key>',
-        // apiKeyExistingSecret: '<secret name>'
+        apiKey: '<api key>',
+        clusterName: clusterName,
     })
 ];
 
-const account = '<account id>'
-const region = '<region>'
-const stackID = '<stack id>'
-const props = { env: { account, region } }
-
-new blueprints.EksBlueprint(app, { id: stackID, addOns}, props)
+new blueprints.EksBlueprint(app, { id: clusterName, addOns}, props)
