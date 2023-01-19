@@ -20,9 +20,12 @@ jobs:
 
       - name: Deps
         run: make deps
+        shell: bash
 
       - name: Build
         run: make build
+        shell: bash
 
       - name: Lint
         run: make lint
+        shell: bash
