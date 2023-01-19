@@ -1,0 +1,118 @@
+name: Release and Publish
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  prepare:
+    name: prepare
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-go@v2
+        with:
+          go-version: "^1.17"
+
+      - name: Calculate next release version
+        id: version
+        run: |
+          echo ${{ secrets.GITHUB_TOKEN }} > token
+          gh auth login --with-token < token
+          go install github.com/davidrjonas/semver-cli@latest
+          commit=$(git log --format="%H" -n 1)
+          last_pr=$(gh api -X GET search/issues -f q="repo:${{ github.repository }} is:closed is:pr sort:created-desc $commit" --jq '.items[0].number')
+          if  [[ $last_pr = ""  ]]; then echo "No pull request found" && exit 0; fi;
+
+          bump=$(gh pr view $last_pr --json labels --jq '.labels | map(select(.name | contains("release")) | .name) | .[0]' | sed s/release-//g)
+          if ! [[ "$bump" =~ ^(major|minor|patch) ]]; then echo "Not a release commit" && exit 0; fi;        
+          echo $bump > bump.txt
+          cat bump.txt
+          current=$(gh release list | awk '{print $1}' | awk 'NR==1' | sed s/v//g)
+
+          next_version=$(semver-cli inc $bump $current)
+          echo "next_version is now $next_version"
+          echo "::set-output name=version::$next_version"
+
+  release:
+    name: release
+    needs: [prepare]
+    if: needs.prepare.outputs.version
+    outputs:
+      tag-name: ${{ steps.commit.outputs.tag-name }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Update package.json version
+        uses: jossef/action-set-json-field@v1
+        with:
+          file: package.json
+          field: version
+          value: ${{ needs.prepare.outputs.version }}
+
+      - name: Commit files
+        id: commit
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add -A
+          git commit -m "bumping release v${{ needs.prepare.outputs.version }}"
+
+          tag_name=v${{ needs.prepare.outputs.version }}
+          git tag $tag_name
+          echo "::set-output name=tag-name::$tag_name"
+
+      - name: Push changes
+        uses: ad-m/github-push-action@v0.6.0
+        with:
+          github_token: ${{ secrets.ADMIN_KOMI_GITHUB_TOKEN }}
+          branch: ${{ github.ref }}
+          tags: true
+
+      - name: Changelog
+        uses: Bullrich/generate-release-changelog@master
+        id: changelog
+        env:
+          REPO: ${{ github.repository }}
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.commit.outputs.tag-name }}
+          release_name: ${{ steps.commit.outputs.tag-name }}
+          body: ${{ steps.changelog.outputs.changelog }}
+          draft: false
+          prerelease: false
+
+  publish:
+    name: publish
+    needs: [release]
+    if: needs.release.outputs.tag-name
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          ref: "${{ needs.release.outputs.tag-name }}"
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          registry-url: https://npm.pkg.github.com/
+
+      - name: "Install dependencies"
+        run: yarn install
+
+      - name: "Publish to GitHub Packages"
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
