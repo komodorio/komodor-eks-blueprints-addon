@@ -27,6 +27,3 @@ jobs:
       - name: Lint
         run: make lint
         shell: bash
-      - name: List
-        run: make list
-        shell: bash
