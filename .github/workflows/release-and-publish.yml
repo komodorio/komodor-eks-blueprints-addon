@@ -30,7 +30,7 @@ jobs:
           if ! [[ "$bump" =~ ^(major|minor|patch) ]]; then echo "Not a release commit" && exit 0; fi;        
           echo $bump > bump.txt
           cat bump.txt
-          current=$(gh release list | awk '{print $1}' | awk 'NR==1' | sed s/v//g)
+          current="0.0.0"
 
           next_version=$(semver-cli inc $bump $current)
           echo "next_version is now $next_version"
@@ -107,7 +107,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 16
-          registry-url: https://npm.pkg.github.com/
+          registry-url: https://registry.npmjs.org
 
       - name: "Install dependencies"
         run: yarn install
@@ -115,4 +115,4 @@ jobs:
       - name: "Publish to GitHub Packages"
         run: npm publish
         env:
-          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}

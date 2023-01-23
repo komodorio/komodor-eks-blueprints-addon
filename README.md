@@ -79,7 +79,7 @@ The CDK code in this repository can be used to deploy a new Amazon EKS cluster w
 1. Add this module as a dependency:
 
 ```
-npm install @komodorio/komodor-eks-blueprints-addon
+npm install @komodor/komodor-eks-blueprints-addon
 ```
 
 2. Use it as follows:
@@ -114,6 +114,7 @@ new blueprints.EksBlueprint(app, { id: clusterName, addOns }, props);
 | `apiKey`               | Your Komodor API key                                                                                                                                           | ""                                                                      |
 | `apiKeyExistingSecret` | Existing k8s Secret storing the API key                                                                                                                        | ""                                                                      |
 | `apiKeyAWSSecret`      | Secret in AWS Secrets Manager storing the API key                                                                                                              | ""                                                                      |
+| `clusterName`          | Name of the EKS cluster you wish to create                                                                                                                     | ""                                                                      |
 | `namespace`            | Namespace where to install the Komdor Agent                                                                                                                    | "default"                                                               |
 | `version`              | Version of the Komodor Agent Helm chart                                                                                                                        | "1.3.4"                                                                 |
 | `release`              | Name of the Helm release                                                                                                                                       | "k8s-watcher"                                                           |
