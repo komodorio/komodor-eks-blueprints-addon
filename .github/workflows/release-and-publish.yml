@@ -110,9 +110,9 @@ jobs:
           registry-url: https://registry.npmjs.org
 
       - name: "Install dependencies"
-        run: yarn install
+        run: npm install --no-progress --no-package-lock --no-save
 
       - name: "Publish to GitHub Packages"
-        run: npm publish
+        run: make build && npm publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
