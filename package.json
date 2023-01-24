@@ -8,6 +8,9 @@
   "bin": {
     "eks-blueprints-patterns": "dist/bin/main.js"
   },
+  "files": [
+    "dist/**/*"
+  ],
   "scripts": {
     "build": "rm -rf dist && tsc",
     "watch": "tsc -w",
@@ -17,6 +20,7 @@
   },
   "dependencies": {
     "@aws-quickstart/eks-blueprints": "latest",
+    "aws-cdk": "^2.20.0",
     "constructs": "^10.0.0",
     "source-map-support": "^0.5.16"
   },
