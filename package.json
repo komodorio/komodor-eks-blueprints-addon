@@ -2,7 +2,7 @@
   "name": "@komodor/komodor-eks-blueprints-addon",
   "description": "Komodor Amazon EKS Blueprints AddOn",
   "author": "Komodor",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
