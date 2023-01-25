@@ -6,11 +6,8 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "eks-blueprints-patterns": "dist/bin/main.js"
+    "eks-ssp-patterns": "bin/main.ts"
   },
-  "files": [
-    "dist/**/*"
-  ],
   "scripts": {
     "build": "rm -rf dist && tsc",
     "watch": "tsc -w",
