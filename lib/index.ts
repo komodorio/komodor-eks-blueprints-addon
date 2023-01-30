@@ -42,7 +42,7 @@ export const defaultProps: HelmAddOnProps & KomodorAddOnProps = {
     }
 };
 
-export class KomdorAddOn extends HelmAddOn {
+export class KomodorAddOn extends HelmAddOn {
 
     readonly options: KomodorAddOnProps;
 
