@@ -8,6 +8,10 @@
   "bin": {
     "eks-ssp-patterns": "bin/main.ts"
   },
+  "files": [
+    "dist/**/*",
+    "bin/**/*"
+  ],
   "scripts": {
     "build": "rm -rf dist && tsc",
     "watch": "tsc -w",
