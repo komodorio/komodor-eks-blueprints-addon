@@ -97,7 +97,7 @@ const clusterName = "<cluster name>";
 const props = { env: { account, region } };
 
 const addOns: Array<blueprints.ClusterAddOn> = [
-  new KomdorAddOn({
+  new KomodorAddOn({
     apiKey: "<api key>",
     clusterName: clusterName,
     values: {}, // additional Helm chart values
