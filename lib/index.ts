@@ -2,29 +2,15 @@ import merge from "ts-deepmerge";
 import { Construct } from 'constructs';
 import { ClusterInfo } from "@aws-quickstart/eks-blueprints/dist/spi";
 import { HelmAddOn, HelmAddOnProps, HelmAddOnUserProps } from '@aws-quickstart/eks-blueprints/dist/addons/helm-addon';
-import { getSecretValue } from "@aws-quickstart/eks-blueprints/dist/utils";
 
 export interface KomodorAddOnProps extends HelmAddOnUserProps {
     /**
      * Your Komdor API key
      */
-    apiKey?: string;
+    apiKey: string;
 
     /**
-     * Use existing Secret which stores API key instead of creating a new one.
-     * The value should be set with the `api-key` key inside the secret.
-     * If set, this parameter takes precedence over "apiKey" and "apiKeyAWSSecret".
-     */
-    apiKeyExistingSecret?: string;
-
-    /**
-     * The name of the secret in AWS Secrets Manager which stores the API key.
-     * If set, this parameter takes precedence over "apiKey".
-     */
-    apiKeyAWSSecret?: string;
-
-    /**
-     * Your eks cluster name.
+     * Your EKS Cluster name.
      */
     clusterName?: string;
 }
@@ -36,6 +22,7 @@ export const defaultProps: HelmAddOnProps & KomodorAddOnProps = {
     release: "k8s-watcher",
     repository: "https://helm-charts.komodor.io",
     version: "1.3.4",
+    apiKey: "",
     values: {
         "watcher.actions.basic": "true",
         "watcher.actions.advanced": "true",
@@ -52,20 +39,14 @@ export class KomodorAddOn extends HelmAddOn {
     }
 
     async deploy(clusterInfo: ClusterInfo): Promise<Construct> {
-        let apiKeyValue: string | undefined
         let clusterName: string | undefined
-
-        if (this.options.apiKeyAWSSecret) {
-            apiKeyValue = await getSecretValue(this.options.apiKeyAWSSecret!, clusterInfo.cluster.stack.region);
-        }
 
         if (this.options.clusterName) {
             clusterName = this.options.clusterName
         }
 
         let values = merge({
-                apiKey: apiKeyValue ? apiKeyValue : this.options.apiKey,
-                apiKeyExistingSecret: this.options.apiKeyExistingSecret,
+                apiKey: this.options.apiKey,
                 "watcher.clusterName": clusterName,
         }, this.options.values ?? {})
 
